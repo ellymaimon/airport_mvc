@@ -170,5 +170,65 @@ namespace Airport.Models
                 conn.Dispose();
             }
         }
+
+        public void AddCity(City newCity)
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"INSERT INTO cities_flights (city_id, flight_id) VALUES (@CityId, @FlightId);";
+
+            MySqlParameter city_id = new MySqlParameter();
+            city_id.ParameterName = "@CityId";
+            city_id.Value = newCity.Id;
+            cmd.Parameters.Add(city_id);
+
+            MySqlParameter flight_id = new MySqlParameter();
+            flight_id.ParameterName = "@CityId";
+            flight_id.Value = Id;
+            cmd.Parameters.Add(flight_id);
+
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+        }
+
+
+        public List<City> GetCities()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT cities.* FROM flights
+            JOIN flights_cities ON (flights.id = flights_cities.flight_id)
+            JOIN cities ON (flights_cities.city_id = cities.id)
+            WHERE flights.id = @CategoryId;";
+
+            MySqlParameter flightIdParameter = new MySqlParameter();
+            flightIdParameter.ParameterName = "@FlightId";
+            flightIdParameter.Value = Id;
+            cmd.Parameters.Add(flightIdParameter);
+
+            MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+            List<City> cities = new List<City> { };
+
+            while (rdr.Read())
+            {
+                int cityId = rdr.GetInt32(0);
+                string cityName = rdr.GetString(1);
+                string cityState = rdr.GetString(2);
+                City newCity = new City(cityName, cityState, cityId);
+                cities.Add(newCity);
+            }
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+            return cities;
+        }
     }
 }
