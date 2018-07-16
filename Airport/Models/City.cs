@@ -29,7 +29,7 @@ namespace Airport.Models
                 City newCity = (City)otherCity;
                 bool idEquality = Id == newCity.Id;
                 bool nameEquality = Name == newCity.Name;
-                bool sateEquality = State == newCity.State;
+                bool stateEquality = State == newCity.State;
                 return (idEquality && nameEquality && stateEquality);
             }
         }
@@ -41,12 +41,12 @@ namespace Airport.Models
             MySqlConnection conn = DB.Connection();
             conn.Open();
             var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM flights;";
+            cmd.CommandText = @"SELECT * FROM cities;";
             var rdr = cmd.ExecuteReader() as MySqlDataReader;
             while (rdr.Read())
             {
                 int id = rdr.GetInt32(0);
-                int name = rdr.GetString(1);
+                string name = rdr.GetString(1);
                 string state = rdr.GetString(2);
 
 
@@ -66,7 +66,7 @@ namespace Airport.Models
             MySqlConnection conn = DB.Connection();
             conn.Open();
             var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM flights WHERE id = (@searchId);";
+            cmd.CommandText = @"SELECT * FROM cities WHERE id = (@searchId);";
 
             MySqlParameter searchId = new MySqlParameter();
             searchId.ParameterName = "@searchId";
@@ -74,21 +74,21 @@ namespace Airport.Models
             cmd.Parameters.Add(searchId);
 
             var rdr = cmd.ExecuteReader() as MySqlDataReader;
-            int id = 0;
+            int cityId = 0;
             string name = "";
             string state = "";
+            // We remove the line setting a itemCategoryId value here.
 
             while (rdr.Read())
             {
-
-                int id = rdr.GetInt32(0);
-                int name = rdr.GetString(1);
-                string state = rdr.GetString(2);
+                cityId = rdr.GetInt32(0);
+                name = rdr.GetString(1);
+                state = rdr.GetString(2);
 
             }
 
-            City newCity = new City(name, state, id);
 
+            City newCity = new City (name, state, cityId);
             conn.Close();
             if (conn != null)
             {
@@ -141,22 +141,24 @@ namespace Airport.Models
             cmd.Parameters.Add(flightIdParameter);
 
             MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
-            List<Flight> cities = new List<Flight> { };
+            List<Flight> flights = new List<Flight> { };
 
             while (rdr.Read())
             {
-                int cityId = rdr.GetInt32(0);
-                string cityName = rdr.GetString(1);
-                string cityState = rdr.GetString(2);
-                Flight newFlight = new Flight(cityName, cityState, cityId);
-                cities.Add(newFlight);
+                int id = rdr.GetInt32(0);
+                int code = rdr.GetInt32(1);
+                string adl = rdr.GetString(2);
+                TimeSpan time = rdr.GetTimeSpan(3);
+                string status = rdr.GetString(4);
+                Flight newFlight = new Flight(code, adl, time, status, id);
+                flights.Add(newFlight);
             }
             conn.Close();
             if (conn != null)
             {
                 conn.Dispose();
             }
-            return cities;
+            return flights;
         }
     }
 }
@@ -171,10 +173,3 @@ namespace Airport.Models
 
 
 
-
-
-
-
-
-    }
-}

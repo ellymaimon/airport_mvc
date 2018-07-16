@@ -13,8 +13,10 @@
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
+        <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="1.0.0" /> 
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Views\Flights\" />
   </ItemGroup>
 </Project>

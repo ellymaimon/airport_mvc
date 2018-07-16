@@ -1,0 +1,32 @@
+﻿@{
+ViewData["Title"] = "All Flights";
+}
+
+<h1> Flights </h1>
+
+
+@foreach (var flight in Model)
+{
+
+    foreach (var city in flight.GetCities())
+    {
+  
+        if(flight.ADL == "Departure")
+        {
+        <h3>Flight Number: @flight.Code</h3>
+        <h4>To: @city.Name, @city.State</h4>
+        <h5>Departure Time: @flight.Time</h5>
+        }
+        else
+        {
+        <h4>From: @city.Name, @city.State</h4>
+        <h5>Arrival Time: @flight.Time</h5>
+
+        }   
+
+    
+
+    }
+}
+
+

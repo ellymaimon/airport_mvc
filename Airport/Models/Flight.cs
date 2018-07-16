@@ -10,12 +10,12 @@ namespace Airport.Models
         public int Id { get; set; }
         public int Code { get; set; }
         public string ADL { get; set; }
-        public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
         public string Status { get; set; }
 
 
 
-        public Flight(int code, string adl, DateTime time, string status, int id = 0)
+        public Flight(int code, string adl, TimeSpan time, string status, int id = 0)
         {
             Code = code;
             ADL = adl;
@@ -83,7 +83,7 @@ namespace Airport.Models
                 int id = rdr.GetInt32(0);
                 int code = rdr.GetInt32(1);
                 string adl = rdr.GetString(2);
-                DateTime time = rdr.GetDateTime(3);
+                TimeSpan time = rdr.GetTimeSpan(3);
                 string status = rdr.GetString(4);
 
                 Flight newFlight = new Flight(code, adl, time, status, id);
@@ -112,7 +112,7 @@ namespace Airport.Models
             var rdr = cmd.ExecuteReader() as MySqlDataReader;
             int _id = 0;
             int code = 0;
-            DateTime time = DateTime.MinValue;
+            TimeSpan time = TimeSpan.MinValue;
             string adl = "";
             string status = "";
 
@@ -121,7 +121,7 @@ namespace Airport.Models
                 _id = rdr.GetInt32(0);
                 code = rdr.GetInt32(1);
                 adl = rdr.GetString(2);
-                time = rdr.GetDateTime(3);
+                time = rdr.GetTimeSpan(3);
                 status = rdr.GetString(4);
             }
 
@@ -176,7 +176,7 @@ namespace Airport.Models
             MySqlConnection conn = DB.Connection();
             conn.Open();
             var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO cities_flights (city_id, flight_id) VALUES (@CityId, @FlightId);";
+            cmd.CommandText = @"INSERT INTO flights_cities (city_id, flight_id) VALUES (@CityId, @FlightId);";
 
             MySqlParameter city_id = new MySqlParameter();
             city_id.ParameterName = "@CityId";
@@ -184,7 +184,7 @@ namespace Airport.Models
             cmd.Parameters.Add(city_id);
 
             MySqlParameter flight_id = new MySqlParameter();
-            flight_id.ParameterName = "@CityId";
+            flight_id.ParameterName = "@FlightId";
             flight_id.Value = Id;
             cmd.Parameters.Add(flight_id);
 
@@ -205,7 +205,7 @@ namespace Airport.Models
             cmd.CommandText = @"SELECT cities.* FROM flights
             JOIN flights_cities ON (flights.id = flights_cities.flight_id)
             JOIN cities ON (flights_cities.city_id = cities.id)
-            WHERE flights.id = @CategoryId;";
+            WHERE flights.id = @FlightId;";
 
             MySqlParameter flightIdParameter = new MySqlParameter();
             flightIdParameter.ParameterName = "@FlightId";
@@ -229,6 +229,12 @@ namespace Airport.Models
                 conn.Dispose();
             }
             return cities;
+        }
+
+        public static int GetCode()
+        {
+            int r = (new Random()).Next(100, 1000);
+            return r;
         }
     }
 }
